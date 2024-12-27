@@ -51,6 +51,14 @@ chmod -R g+r /opt/apache-guacamole/tomcat9/conf
 chmod g+x /opt/apache-guacamole/tomcat9/conf
 msg_ok "Setup Apache Tomcat"
 
+msg_info "Creating guacd.conf"
+cat <<EOF >/etc/guacamole/guacd.conf
+[server]
+bind_host = 0.0.0.0
+bind_port = 4822
+EOF
+msg_ok "Created guacd.conf"
+
 msg_info "Setup Apache Guacamole"
 mkdir -p /etc/guacamole/{extensions,lib}
 RELEASE_SERVER=$(curl -sL https://api.github.com/repos/apache/guacamole-server/tags | jq -r '.[0].name')
