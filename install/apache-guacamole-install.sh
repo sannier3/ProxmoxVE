@@ -127,7 +127,6 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 systemctl -q enable --now tomcat guacd mysql
-systemctl start guacd
 msg_ok "Setup Service"
 
 motd_ssh
