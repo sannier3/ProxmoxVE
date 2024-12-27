@@ -51,14 +51,6 @@ chmod -R g+r /opt/apache-guacamole/tomcat9/conf
 chmod g+x /opt/apache-guacamole/tomcat9/conf
 msg_ok "Setup Apache Tomcat"
 
-msg_info "Creating guacd.conf"
-cat <<EOF >/etc/guacamole/guacd.conf
-[server]
-bind_host = 127.0.0.1
-bind_port = 4822
-EOF
-msg_ok "Created guacd.conf"
-
 msg_info "Setup Apache Guacamole"
 mkdir -p /etc/guacamole/{extensions,lib}
 RELEASE_SERVER=$(curl -sL https://api.github.com/repos/apache/guacamole-server/tags | jq -r '.[0].name')
@@ -106,6 +98,11 @@ cat *.sql | mysql -u root ${DB_NAME}
 msg_ok "Setup Database"
 
 msg_info "Setup Service"
+cat <<EOF >/etc/guacamole/guacd.conf
+[server]
+bind_host = 127.0.0.1
+bind_port = 4822
+EOF
 JAVA_HOME=$(update-alternatives --query javadoc | grep Value: | head -n1 | sed 's/Value: //' | sed 's@bin/javadoc$@@')
 cat <<EOF >/etc/systemd/system/tomcat.service
 [Unit]
@@ -130,6 +127,7 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 systemctl -q enable --now tomcat guacd mysql
+systemctl start guacd
 msg_ok "Setup Service"
 
 motd_ssh
