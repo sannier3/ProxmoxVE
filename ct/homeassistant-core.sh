@@ -1,31 +1,33 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
-# Copyright (c) 2021-2024 tteck
-# Author: tteck (tteckster)
+# Copyright (c) 2021-2025 community-scripts ORG
+# Author: tteck (tteckster) | Co-Author: MickLesk (CanbiZ)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://www.home-assistant.io/
 
-# App Default Values
 APP="Home Assistant-Core"
 var_tags="automation;smarthome"
 var_cpu="2"
-var_ram="1024"
-var_disk="8"
+var_ram="2048"
+var_disk="10"
 var_os="ubuntu"
-var_version="24.04"
+var_version="24.10"
 var_unprivileged="1"
 
-# App Output & Base Settings
 header_info "$APP"
-base_settings
-
-# Core
 variables
 color
 catch_errors
 
 function update_script() {
   header_info
+
+  # OS Check
+  if ! lsb_release -d | grep -q "Ubuntu 24.10"; then
+    msg_error "Wrong OS detected. This script only supports Ubuntu 24.10."
+    msg_error "Read Guide: https://github.com/community-scripts/ProxmoxVE/discussions/1549"
+    exit 1
+  fi
   check_container_storage
   check_container_resources
   if [[ ! -d /srv/homeassistant ]]; then
@@ -51,15 +53,13 @@ function update_script() {
       echo -e "${GN}Updating to Stable Version${CL}"
       BR=""
     fi
-    if [[ "$PY" == "python3.11" ]]; then echo -e "⚠️  Home Assistant will soon require Python 3.12."; fi
-
     msg_info "Stopping Home Assistant"
     systemctl stop homeassistant
     msg_ok "Stopped Home Assistant"
 
     msg_info "Updating Home Assistant"
     source /srv/homeassistant/bin/activate
-    uv pip install ${BR}--upgrade homeassistant &>/dev/null
+    pip install ${BR}--upgrade homeassistant &>/dev/null
     msg_ok "Updated Home Assistant"
 
     msg_info "Starting Home Assistant"
@@ -73,7 +73,7 @@ function update_script() {
   if [ "$UPD" == "2" ]; then
     msg_info "Installing Home Assistant Community Store (HACS)"
     apt update &>/dev/null
-    apt install unzip &>/dev/null
+    apt install -y unzip &>/dev/null
     cd .homeassistant
     bash <(curl -fsSL https://get.hacs.xyz) &>/dev/null
     msg_ok "Installed Home Assistant Community Store (HACS)"
@@ -100,16 +100,19 @@ function update_script() {
     msg_ok "Installed FileBrowser"
 
     msg_info "Creating Service"
-    service_path="/etc/systemd/system/filebrowser.service"
-    echo "[Unit]
+    cat <<EOF > /etc/systemd/system/filebrowser.service
+[Unit]
 Description=Filebrowser
 After=network-online.target
+
 [Service]
 User=root
 WorkingDirectory=/root/
 ExecStart=/usr/local/bin/filebrowser -r /root/.homeassistant
+
 [Install]
-WantedBy=default.target" >$service_path
+WantedBy=default.target
+EOF
 
     systemctl enable --now -q filebrowser.service
     msg_ok "Created Service"

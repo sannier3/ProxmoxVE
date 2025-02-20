@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
-# Copyright (c) 2021-2024 community-scripts ORG
+# Copyright (c) 2021-2025 community-scripts ORG
 # Author: kristocopani
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://lubelogger.com/
 
-# App Default Values
 APP="LubeLogger"
-var_tags="verhicle;car"
+var_tags="vehicle;car"
 var_cpu="1"
 var_ram="512"
 var_disk="2"
@@ -15,11 +14,7 @@ var_os="debian"
 var_version="12"
 var_unprivileged="1"
 
-# App Output & Base Settings
 header_info "$APP"
-base_settings
-
-# Core
 variables
 color
 catch_errors
@@ -42,11 +37,22 @@ function update_script() {
     msg_info "Updating ${APP} to v${RELEASE}"
     cd /opt
     wget -q https://github.com/hargata/lubelog/releases/download/v${RELEASE}/LubeLogger_v${RELEASE_TRIMMED}_linux_x64.zip
-    cp /opt/lubelogger/appsettings.json /opt/appsettings.json
+    mkdir -p /tmp/lubeloggerData/data
+    cp /opt/lubelogger/appsettings.json /tmp/lubeloggerData/appsettings.json
+    cp -r /opt/lubelogger/data/ /tmp/lubeloggerData/
+
+    # Lubelogger has moved multiples folders to the 'data' folder, and we need to move them before the update to keep the user data
+    # Github Discussion: https://github.com/hargata/lubelog/discussions/787
+    [[ -e /opt/lubelogger/config ]] && cp -r /opt/lubelogger/config /tmp/lubeloggerData/data/
+    [[ -e /opt/lubelogger/wwwroot/translations ]] && cp -r /opt/lubelogger/wwwroot/translations /tmp/lubeloggerData/data/
+    [[ -e /opt/lubelogger/wwwroot/documents ]] && cp -r /opt/lubelogger/wwwroot/documents /tmp/lubeloggerData/data/
+    [[ -e /opt/lubelogger/wwwroot/images ]] && cp -r /opt/lubelogger/wwwroot/images /tmp/lubeloggerData/data/
+    [[ -e /opt/lubelogger/wwwroot/temp ]] && cp -r /opt/lubelogger/wwwroot/temp /tmp/lubeloggerData/data/
+    [[ -e /opt/lubelogger/log ]] && cp -r /opt/lubelogger/log /tmp/lubeloggerData/
     rm -rf /opt/lubelogger
     unzip -qq LubeLogger_v${RELEASE_TRIMMED}_linux_x64.zip -d lubelogger
     chmod 700 /opt/lubelogger/CarCareTracker
-    mv -f /opt/appsettings.json /opt/lubelogger/appsettings.json
+    cp -rf /tmp/lubeloggerData/* /opt/lubelogger/
     echo "${RELEASE}" >"/opt/${APP}_version.txt"
     msg_ok "Updated ${APP} to v${RELEASE}"
 
@@ -56,6 +62,7 @@ function update_script() {
 
     msg_info "Cleaning up"
     rm -rf /opt/LubeLogger_v${RELEASE_TRIMMED}_linux_x64.zip
+    rm -rf /tmp/lubeloggerData
     msg_ok "Cleaned"
     msg_ok "Updated Successfully"
   else

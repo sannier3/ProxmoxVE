@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
-# Copyright (c) 2021-2024 tteck
+# Copyright (c) 2021-2025 tteck
 # Author: tteck (tteckster)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://www.zabbix.com/
 
-# App Default Values
 APP="Zabbix"
 var_tags="monitoring"
 var_cpu="2"
@@ -15,11 +14,7 @@ var_os="debian"
 var_version="12"
 var_unprivileged="1"
 
-# App Output & Base Settings
 header_info "$APP"
-base_settings
-
-# Core
 variables
 color
 catch_errors
@@ -41,10 +36,10 @@ function update_script() {
     cp /etc/zabbix/zabbix_server.conf /opt/zabbix-backup/
     cp /etc/apache2/conf-enabled/zabbix.conf /opt/zabbix-backup/
     cp -R /usr/share/zabbix/ /opt/zabbix-backup/
-    cp -R /usr/share/zabbix-* /opt/zabbix-backup/
+    #cp -R /usr/share/zabbix-* /opt/zabbix-backup/ Remove temporary
     rm -Rf /etc/apt/sources.list.d/zabbix.list
     cd /tmp
-    wget -q https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_latest+debian12_all.deb
+    wget -q https://repo.zabbix.com/zabbix/7.2/release/debian/pool/main/z/zabbix-release/zabbix-release_latest+debian12_all.deb
     dpkg -i zabbix-release_latest+debian12_all.deb &>/dev/null
     apt-get update &>/dev/null
     apt-get install --only-upgrade zabbix-server-pgsql zabbix-frontend-php zabbix-agent2 zabbix-agent2-plugin-* &>/dev/null

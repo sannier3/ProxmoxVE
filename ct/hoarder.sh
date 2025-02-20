@@ -1,25 +1,20 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
-# Copyright (c) 2021-2024 tteck
+# Copyright (c) 2021-2025 tteck
 # Author: MickLesk (Canbiz) & vhsdream
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://hoarder.app/
 
-# App Default Values
 APP="Hoarder"
 var_tags="bookmark"
 var_cpu="2"
 var_ram="4096"
-var_disk="8"
+var_disk="10"
 var_os="debian"
 var_version="12"
 var_unprivileged="1"
 
-# App Output & Base Settings
 header_info "$APP"
-base_settings
-
-# Core
 variables
 color
 catch_errors
@@ -39,8 +34,14 @@ function update_script() {
     systemctl stop hoarder-web hoarder-workers hoarder-browser
     msg_ok "Stopped Services"
     msg_info "Updating ${APP} to v${RELEASE}"
+    if [[ $(corepack -v) < "0.31.0" ]]; then
+      npm install -g corepack@0.31.0 &>/dev/null
+    fi
     cd /opt
-    mv /opt/hoarder/.env /opt/.env
+    if [[ -f /opt/hoarder/.env ]] && [[ ! -f /etc/hoarder/hoarder.env ]]; then
+      mkdir -p /etc/hoarder
+      mv /opt/hoarder/.env /etc/hoarder/hoarder.env
+    fi
     rm -rf /opt/hoarder
     wget -q "https://github.com/hoarder-app/hoarder/archive/refs/tags/v${RELEASE}.zip"
     unzip -q v${RELEASE}.zip
@@ -54,8 +55,7 @@ function update_script() {
     export DATA_DIR=/opt/hoarder_data
     cd /opt/hoarder/packages/db
     pnpm migrate &>/dev/null
-    mv /opt/.env /opt/hoarder/.env
-    sed -i "s/SERVER_VERSION=${PREV_RELEASE}/SERVER_VERSION=${RELEASE}/" /opt/hoarder/.env
+    sed -i "s/SERVER_VERSION=${PREV_RELEASE}/SERVER_VERSION=${RELEASE}/" /etc/hoarder/hoarder.env
     msg_ok "Updated ${APP} to v${RELEASE}"
 
     msg_info "Starting Services"

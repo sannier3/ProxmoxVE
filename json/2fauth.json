@@ -2,7 +2,7 @@
     "name": "2FAuth",
     "slug": "2fauth",
     "categories": [
-      0
+        6
     ],
     "date_created": "2024-12-20",
     "type": "ct",
@@ -21,7 +21,7 @@
           "cpu": 1,
           "ram": 512,
           "hdd": 2,
-          "os": "Debian",
+          "os": "debian",
           "version": "12"
         }
       }

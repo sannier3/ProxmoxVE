@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2021-2024 community-scripts ORG
+# Copyright (c) 2021-2025 community-scripts ORG
 # Author: MickLesk (Canbiz)
 # License: MIT
 # https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
@@ -102,7 +102,7 @@ while true; do
   esac
 done
 
-if ! pveversion | grep -Eq "pve-manager/8.[0-3]"; then
+if ! pveversion | grep -Eq "pve-manager/8\.[0-3](\.[0-9]+)*"; then
   msg_error "This version of Proxmox Virtual Environment is not supported"
   msg_error "⚠️ Requires Proxmox Virtual Environment Version 8.0 or later."
   msg_error "Exiting..."

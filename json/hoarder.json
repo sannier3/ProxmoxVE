@@ -2,7 +2,7 @@
   "name": "Hoarder",
   "slug": "hoarder",
   "categories": [
-    14
+        12
   ],
   "date_created": "2024-12-02",
   "type": "ct",
@@ -20,7 +20,7 @@
       "resources": {
         "cpu": 2,
         "ram": 4096,
-        "hdd": 8,
+        "hdd": 10,
         "os": "debian",
         "version": "12"
       }

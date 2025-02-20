@@ -2,11 +2,11 @@
     "name": "Zoraxy",
     "slug": "zoraxy",
     "categories": [
-        11
+        4
     ],
     "date_created": "2024-05-02",
     "type": "ct",
-    "updateable": false,
+    "updateable": true,
     "privileged": false,
     "interface_port": 8000,
     "documentation": null,

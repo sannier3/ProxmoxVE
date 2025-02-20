@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
-# Copyright (c) 2021-2024 tteck
+# Copyright (c) 2021-2025 tteck
 # Author: tteck (tteckster)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://linkwarden.app/
 
-# App Default Values
 APP="Linkwarden"
 var_tags="bookmark"
 var_cpu="2"
@@ -14,11 +13,7 @@ var_disk="12"
 var_os="ubuntu"
 var_version="22.04"
 
-# App Output & Base Settings
 header_info "$APP"
-base_settings
-
-# Core
 variables
 color
 catch_errors
@@ -40,6 +35,7 @@ function update_script() {
     msg_info "Updating ${APP} to ${RELEASE}"
     cd /opt
     mv /opt/linkwarden/.env /opt/.env
+    rm -rf /opt/linkwarden
     RELEASE=$(curl -s https://api.github.com/repos/linkwarden/linkwarden/releases/latest | grep "tag_name" | awk '{print substr($2, 2, length($2)-3) }')
     wget -q "https://github.com/linkwarden/linkwarden/archive/refs/tags/${RELEASE}.zip"
     unzip -q ${RELEASE}.zip
@@ -59,7 +55,6 @@ function update_script() {
     msg_ok "Started ${APP}"
     msg_info "Cleaning up"
     rm -rf /opt/${RELEASE}.zip
-    rm -rf /opt/linkwarden_bak
     msg_ok "Cleaned"
     msg_ok "Updated Successfully"
   else

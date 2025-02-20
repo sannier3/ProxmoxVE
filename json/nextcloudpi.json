@@ -2,7 +2,7 @@
     "name": "Nextcloud",
     "slug": "nextcloudpi",
     "categories": [
-        12
+        2
     ],
     "date_created": "2024-05-02",
     "type": "ct",
@@ -33,7 +33,7 @@
                 "ram": 1024,
                 "hdd": 2,
                 "os": "alpine",
-                "version": "3.19"
+                "version": "3.21"
             }
         }
     ],
@@ -41,5 +41,10 @@
         "username": null,
         "password": null
     },
-    "notes": []
+    "notes": [
+        {
+            "text": "Only Alpine: To get the username and password, run the script again inside the LXC shell.",
+            "type": "warning"
+        }
+    ]
 }

@@ -2,7 +2,7 @@
     "name": "Jenkins",
     "slug": "jenkins",
     "categories": [
-      3
+        22
     ],
     "date_created": "2024-12-26",
     "type": "ct",
@@ -21,7 +21,7 @@
           "cpu": 2,
           "ram": 1024,
           "hdd": 4,
-          "os": "Debian",
+          "os": "debian",
           "version": "12"
         }
       }

@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
-# Copyright (c) 2021-2024 tteck
+# Copyright (c) 2021-2025 tteck
 # Author: MickLesk (Canbiz)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://tianji.msgbyte.com/
 
-# App Default Values
 APP="Tianji"
 var_tags="monitoring"
 var_cpu="4"
@@ -15,11 +14,7 @@ var_os="debian"
 var_version="12"
 var_unprivileged="1"
 
-# App Output & Base Settings
 header_info "$APP"
-base_settings
-
-# Core
 variables
 color
 catch_errors
@@ -36,7 +31,8 @@ function update_script() {
     msg_info "Stopping ${APP} Service"
     systemctl stop tianji
     msg_ok "Stopped ${APP} Service"
-    msg_info "Updating ${APP} to ${RELEASE}"
+    
+    msg_info "Updating ${APP} to v${RELEASE}"
     cd /opt
     cp /opt/tianji/src/server/.env /opt/.env
     mv /opt/tianji /opt/tianji_bak
@@ -44,6 +40,7 @@ function update_script() {
     unzip -q v${RELEASE}.zip
     mv tianji-${RELEASE} /opt/tianji
     cd tianji
+    export NODE_OPTIONS="--max_old_space_size=4096"
     pnpm install --filter @tianji/client... --config.dedupe-peer-dependents=false --frozen-lockfile >/dev/null 2>&1
     pnpm build:static >/dev/null 2>&1
     pnpm install --filter @tianji/server... --config.dedupe-peer-dependents=false >/dev/null 2>&1
@@ -54,10 +51,12 @@ function update_script() {
     cd src/server
     pnpm db:migrate:apply >/dev/null 2>&1
     echo "${RELEASE}" >/opt/${APP}_version.txt
-    msg_ok "Updated ${APP} to ${RELEASE}"
+    msg_ok "Updated ${APP} to v${RELEASE}"
+    
     msg_info "Starting ${APP}"
     systemctl start tianji
     msg_ok "Started ${APP}"
+    
     msg_info "Cleaning up"
     rm -R /opt/v${RELEASE}.zip
     rm -rf /opt/tianji_bak
@@ -67,7 +66,7 @@ function update_script() {
     msg_ok "Cleaned"
     msg_ok "Updated Successfully"
   else
-    msg_ok "No update required.  ${APP} is already at ${RELEASE}."
+    msg_ok "No update required.  ${APP} is already at v${RELEASE}."
   fi
   exit
 }

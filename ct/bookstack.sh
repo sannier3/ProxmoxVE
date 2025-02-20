@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
-# Copyright (c) 2021-2024 community-scripts ORG
+# Copyright (c) 2021-2025 community-scripts ORG
 # Author: MickLesk (Canbiz)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://github.com/BookStackApp/BookStack
 
-# App Default Values
 APP="Bookstack"
 var_tags="organizer"
 var_cpu="1"
@@ -15,11 +14,7 @@ var_os="debian"
 var_version="12"
 var_unprivileged="1"
 
-# App Output & Base Settings
 header_info "$APP"
-base_settings
-
-# Core
 variables
 color
 catch_errors
@@ -44,9 +39,9 @@ function update_script() {
     unzip -q /opt/v${RELEASE}.zip -d /opt
     mv /opt/BookStack-${RELEASE} /opt/bookstack
     cp /opt/bookstack-backup/.env /opt/bookstack/.env
-    cp -r /opt/bookstack-backup/public/uploads/ /opt/bookstack/public/uploads
-    cp -r /opt/bookstack-backup/storage/uploads/ /opt/bookstack/storage/uploads
-    cp -r /opt/bookstack-backup/themes/ /opt/bookstack/themes
+    cp -r /opt/bookstack-backup/public/uploads/* /opt/bookstack/public/uploads/ 2>/dev/null || true
+    cp -r /opt/bookstack-backup/storage/uploads/* /opt/bookstack/storage/uploads/ 2>/dev/null || true
+    cp -r /opt/bookstack-backup/themes/* /opt/bookstack/themes/ 2>/dev/null || true
     cd /opt/bookstack
     COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev &>/dev/null
     php artisan migrate --force &>/dev/null
